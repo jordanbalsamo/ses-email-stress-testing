@@ -4,7 +4,7 @@ The intention of this set of scripts is to send email templates to a specified e
 
 # An Important Note
 
-- Keep message volumes within sensible limits. Ceck your AWS account for the limits imposed. Abuse will mean that AWS will stop your use of SES.
+- Keep message volumes within sensible limits. Check your AWS account for the limits imposed. Abuse will mean that AWS will stop your use of SES.
 - Do not use recipients or senders that have not been validated via the given SES account, as this will cause your reputation on AWS SES to degrade and will have a direct impact on your ability to use AWS SES in the future.
 
 The addition of recipients and senders is controlled via Pull Requests to the repo, where you will need a reviewer to approve prior to running the scipt.
@@ -79,7 +79,7 @@ If you wish to improve this repo, please raise a PR :).
 
 1) Config to be driven by a JSON file;
 2) Flagged function to randomise choice of template on each iteration using random.choice;
-3) Attachments to be downloaded from a form of BLOB storage to keep repo more lightweight.
+3) Attachments to be downloaded from a given remote object storage facility (Azure Blob Storage, S3, etc.) to keep repo more lightweight.
 4) Parallelisation to be achieved via parallel stages running in a pipeline.
 
 # References
