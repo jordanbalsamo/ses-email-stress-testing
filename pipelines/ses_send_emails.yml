@@ -1,0 +1,66 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+- name: ITERATIONS
+  displayName: Iterations (INT)
+  type: number
+  default: 1
+- name: SLEEP_SECONDS
+  displayName: Sleep Seconds (INT)
+  type: number
+  default: 0
+- name: TEMPLATE_CHOICE
+  displayName: Template Choice (INT)
+  type: number
+- name: PARALLELISM
+  displayName: Parallelism (INT)
+  type: number
+  default: 1
+  values:
+  - 1
+  - 2
+  - 3
+
+variables:
+- name: SAFEGUARD_LIMIT
+  value: 5000 # this controls maximum amount of iterations that can be sent by one thread. Please PR to amend.
+    
+# stages:  
+# here we can parallelise the script with multiple agents across stages, if required.
+jobs:
+- job: SendEmailTemplateSES
+  displayName: Send Email Templates via SES with Parameters
+  timeoutInMinutes: 300 # 5 hours, please PR to change.
+  strategy:
+    parallel: ${{ parameters.PARALLELISM }}
+  steps:
+  # Install dependencies
+  - script: sudo apt-get update -y
+    displayName: 'Host: apt-get update'
+
+  - script: sudo apt-get install python3-setuptools python-dev build-essential
+    displayName: 'Lib: install Python'
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.9'
+      addToPath: true
+    displayName: 'Task: Use Python 3.9'
+
+  - script: |
+      pip3 install -r requirements.txt
+    displayName: 'Lib: Install pip requirements'
+
+  - script: |
+      export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      python3 ses_send_raw_email.py --safeguard-limit $(SAFEGUARD_LIMIT) --iterations ${{ parameters.ITERATIONS }} --sleep-seconds ${{ parameters.SLEEP_SECONDS }} --template-choice ${{ parameters.TEMPLATE_CHOICE }}
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    displayName: 'Script: send emails with chosen params'
+    
+      
