@@ -1,5 +1,3 @@
-import datetime
-
 email_templates = [
     {
         'id': 0, # Reserving this for testing code.
